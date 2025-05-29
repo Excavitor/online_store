@@ -10,8 +10,8 @@ class Customer(models.Model):
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # def __str__(self):
-    #     return self.first_name + " " + self.last_name
+    def __str__(self):
+        return self.first_name + ' ' + self.last_name
 
     class Meta:
         ordering = ['-created_at']
@@ -19,6 +19,9 @@ class Customer(models.Model):
 class Category(models.Model):
     title = models.CharField(max_length=100)
     slug = models.SlugField(unique=True, default="-")
+
+    def __str__(self):
+        return self.title
 
     class Meta:
         ordering = ['id']
@@ -33,6 +36,9 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.title
+
     class Meta:
         ordering = ['-created_at']
 
@@ -46,6 +52,9 @@ class Order(models.Model):
     placed_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=10, choices= STATUS_CHOICES,  default="Pending")
 
+    def __str__(self):
+        return self.customer.first_name + " " + self.customer.last_name
+
     class Meta:
         ordering = ['status', 'placed_at']
 
@@ -54,6 +63,9 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1, validators=[MinValueValidator(1)])
     unit_price = models.DecimalField(max_digits=8, decimal_places=2)
+
+    def __str__(self):
+        return self.product.title
 
     class Meta:
         ordering = ['-quantity', '-unit_price']

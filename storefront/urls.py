@@ -24,5 +24,5 @@ admin.site.site_header = "e-commerce ADMIN"
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('__debug__/', include(debug_toolbar.urls)),
-    path('', views.home, name='home'),
+    path('', include('store_app.urls')),
 ]
