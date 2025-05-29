@@ -19,10 +19,16 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title', 'description', 'price', 'inventory', 'is_available', 'created_at']
-    list_editable = ['is_available', 'price']
+    list_display = ['id', 'title', 'description', 'price', 'inventory', 'is_available_status', 'created_at']
+    list_editable = ['price']
     list_filter = ['is_available', 'created_at']
     search_fields = ['title', 'description']
+
+    @admin.display(ordering='is_available')
+    def is_available_status(self, product):
+        if product.is_available:
+            return "Yes"
+        return "No"
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
