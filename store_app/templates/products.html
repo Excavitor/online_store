@@ -51,7 +51,13 @@
                             <td class="px-6 py-4 text-sm">{{ products.description }}</td>
                             <td class="px-6 py-4 text-sm">{{ products.price }}</td>
                             <td class="px-6 py-4 text-sm">{{ products.inventory }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.is_available }}</td>
+                            <td class="px-6 py-4 text-sm">
+                                {% if products.is_available %}
+                                Yes
+                                {% else %}
+                                No
+                                {% endif %}
+                            </td>
                             <td class="px-6 py-4 text-sm">{{ products.created_at }}</td>
                             <td class="px-6 py-4 text-sm">{{ products.category_id }}</td>
                         </tr>

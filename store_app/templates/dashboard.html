@@ -38,7 +38,7 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">ID</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">First Name</th>
+                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Name</th>
                             <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Phone Number</th>
                         </tr>
                     </thead>
@@ -46,7 +46,7 @@
                         {% for customer in customer_orders_pending %}
                         <tr>
                             <td class="px-6 py-4 text-sm">{{ customer.id }}</td>
-                            <td class="px-6 py-4 text-sm">{{ customer.first_name }}</td>
+                            <td class="px-6 py-4 text-sm">{{ customer.first_name }} {{ customer.last_name }}</td>
                             <td class="px-6 py-4 text-sm">{{ customer.phone_number }}</td>
                         </tr>
                         {% endfor %}
