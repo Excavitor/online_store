@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add Product - Store Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-800">
+<div class="flex min-h-screen">
+    <aside class="w-64 bg-white shadow-md p-6 space-y-4">
+        <h2 class="text-2xl font-bold mb-6 text-blue-600">Store Admin</h2>
+        <nav class="space-y-2">
+            <a href="{% url 'dashboard' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Dashboard</a>
+            <a href="{% url 'customer' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Customer</a>
+            <a href="{% url 'products' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Product</a>
+            <a href="{% url 'orders' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Order</a>
+            <a href="{% url 'categories' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Category</a>
+            <a href="{% url 'orderitems' %}" class="block px-4 py-2 rounded hover:bg-blue-100 text-blue-700 font-medium">Order Items</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-6">
+        <div class="bg-white rounded-lg shadow p-4 mb-6">
+            <h3 class="text-lg font-semibold">Admin: <span class="text-blue-600">{{ name }}</span></h3>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="text-2xl font-semibold mb-4">Add New Product</h2>
+            <form method="POST" action="{% url 'add_product' %}" class="space-y-4">
+                {% csrf_token %}  <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Product Title:</label>
+                    <input type="text" name="title" id="title" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description:</label>
+                    <textarea name="description" id="description" rows="3" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                </div>
+                <div>
+                    <label for="price" class="block text-sm font-medium text-gray-700">Price:</label>
+                    <input type="number" name="price" id="price" step="0.01" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="inventory" class="block text-sm font-medium text-gray-700">Inventory:</label>
+                    <input type="number" name="inventory" id="inventory" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+                <div>
+                    <label for="category" class="block text-sm font-medium text-gray-700">Category:</label>
+                    <select name="category" id="category" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        {% for category in categories_set %}
+                            <option value="{{ category.id }}">{{ category.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="is_available" id="is_available" checked class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="is_available" class="ml-2 block text-sm text-gray-900">Is Available?</label>
+                </div>
+                <div>
+                    <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Add Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>
