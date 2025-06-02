@@ -2,13 +2,112 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from store_app.models import Customer, Category, Order, Product, OrderItem
 
+from django.contrib.auth.models import User, Group
+from django.contrib.auth.decorators import login_required # Optional: if you want to protect these views
+from .forms import UserCreationForm, UserEditForm, RoleForm # Import your new forms
+from django.contrib import messages # For showing success/error messages
+
 # Create your views here.
 # def home(request):
 #     return HttpResponse("Hello, world. You're at the home page.")
 
+def home(request):
+    return render(request, 'store_app/home.html')
+
+def list_users(request):
+    users = User.objects.all()
+    return render(request, 'store_app/users_list.html', {'users_set': users, 'name': 'Shad Abdullah'})
+
+def create_user(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            messages.success(request, f"User '{user.username}' created successfully!")
+            return redirect('list_users')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = UserCreationForm()
+    return render(request, 'store_app/user_form.html', {'form': form, 'action': 'Create', 'name': 'Shad Abdullah'})
+
+# @login_required (optional)
+def edit_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        form = UserEditForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"User '{user.username}' updated successfully!")
+            return redirect('list_users')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = UserEditForm(instance=user)
+    return render(request, 'store_app/user_form.html', {'form': form, 'user_obj': user, 'action': 'Edit', 'name': 'Shad Abdullah'})
+
+# @login_required (optional)
+def delete_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        if request.user.id == user.id:
+             messages.error(request, "You cannot delete yourself.")
+             return redirect('list_users')
+        username = user.username
+        user.delete()
+        messages.success(request, f"User '{username}' deleted successfully.")
+        return redirect('list_users')
+    # return render(request, 'store_app/user_confirm_delete.html', {'user_obj': user, 'name': 'Shad Abdullah'})
+    return redirect('list_users')
+
+def list_roles(request):
+    roles = Group.objects.all()
+    return render(request, 'store_app/roles_list.html', {'roles_set': roles, 'name': 'Shad Abdullah'})
+
+def create_role(request):
+    if request.method == 'POST':
+        form = RoleForm(request.POST)
+        if form.is_valid():
+            role = form.save()
+            messages.success(request, f"Role '{role.name}' created successfully!")
+            return redirect('list_roles')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = RoleForm()
+    return render(request, 'store_app/role_form.html', {'form': form, 'action': 'Create', 'name': 'Shad Abdullah'})
+
+# @login_required (optional)
+def edit_role(request, role_id):
+    role = get_object_or_404(Group, id=role_id)
+    if request.method == 'POST':
+        form = RoleForm(request.POST, instance=role)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Role '{role.name}' updated successfully!")
+            return redirect('list_roles')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = RoleForm(instance=role)
+    return render(request, 'store_app/role_form.html', {'form': form, 'role_obj': role, 'action': 'Edit', 'name': 'Shad Abdullah'})
+
+# @login_required (optional)
+def delete_role(request, role_id):
+    role = get_object_or_404(Group, id=role_id)
+    if request.method == 'POST':
+        role_name = role.name
+        if role.user_set.exists():
+             messages.error(request, f"Role '{role_name}' is in use and cannot be deleted.")
+             return redirect('list_roles')
+        role.delete()
+        messages.success(request, f"Role '{role_name}' deleted successfully.")
+        return redirect('list_roles')
+    # return render(request, 'store_app/role_confirm_delete.html', {'role_obj': role, 'name': 'Shad Abdullah'})
+    return redirect('list_roles')
+
 def dashboard(request):
     customer_orders_pending = Customer.objects.filter(order__status='Pending')
-
 
     return render(
         request,
