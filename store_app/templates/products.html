@@ -29,43 +29,56 @@
         </div>
 
         <div class="bg-white rounded-lg shadow p-6">
-            <h2 class="text-2xl font-semibold mb-4">Products</h2> <div class="overflow-x-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-semibold">Products</h2>
+                <a href="{% url 'add_product' %}" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">Add New Product</a>
+            </div>
+            <div class="overflow-x-auto">
                 <table class="min-w-full border border-gray-200">
                     <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">ID</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Product Name</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Product Description</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Price</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Inventory</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Available</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Arrived</th>
-                            <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category ID</th>
-                        </tr>
+                    <tr>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">ID</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Product Name</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Product Description</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Price</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Inventory</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Available</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Arrived</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Category ID</th>
+                        <th class="px-6 py-3 text-left text-sm font-medium text-gray-700">Actions</th> </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100">
-                        {% for products in products_set %}
-                        <tr>
-                            <td class="px-6 py-4 text-sm">{{ products.id }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.title }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.description }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.price }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.inventory }}</td>
-                            <td class="px-6 py-4 text-sm">
-                                {% if products.is_available %}
-                                Yes
-                                {% else %}
-                                No
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 text-sm">{{ products.created_at }}</td>
-                            <td class="px-6 py-4 text-sm">{{ products.category_id }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-sm text-center text-gray-500">No products found.</td>
-                        </tr>
-                        {% endfor %}
+                    {% for products_item in products_set %}
+                    <tr>
+                        <td class="px-6 py-4 text-sm">{{ products_item.id }}</td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.title }}</td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.description }}</td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.price }}</td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.inventory }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if products_item.is_available %}
+                            Yes
+                            {% else %}
+                            No
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.created_at }}</td>
+                        <td class="px-6 py-4 text-sm">{{ products_item.category_id }}</td>
+                        <td class="px-6 py-4 text-sm whitespace-nowrap">
+                            <a href="{% url 'edit_product' product_id=products_item.id %}"
+                               class="text-indigo-600 hover:text-indigo-900 mr-3">Edit
+                            </a>
+                            <form method="POST" action="{% url 'delete_product' product_id=products_item.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="px-6 py-4 text-sm text-center text-gray-500">No products found.</td>
+                    </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>

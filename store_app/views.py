@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from store_app.models import Customer, Category, Order, Product, OrderItem
 
@@ -39,6 +39,67 @@ def products(request):
             'products_set': list(products_set),
         }
     )
+
+def add_product(request):
+    categories_set = Category.objects.all()
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        inventory = request.POST.get('inventory')
+        category_id = request.POST.get('category')
+        is_available = request.POST.get('is_available') == 'on'
+
+        if title and price and inventory and category_id:
+            category = Category.objects.get(id=category_id)
+            Product.objects.create(
+                title=title,
+                description=description,
+                price=price,
+                inventory=inventory,
+                category=category,
+                is_available=is_available
+            )
+            return redirect('products')
+
+    return render(
+        request,
+        'add_product.html',
+        {'categories_set': categories_set, 'name': 'Shad Abdullah'}
+    )
+
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    categories_set = Category.objects.all()
+
+    if request.method == 'POST':
+        product.title = request.POST.get('title')
+        product.description = request.POST.get('description')
+        product.price = request.POST.get('price')
+        product.inventory = request.POST.get('inventory')
+        category_id = request.POST.get('category')
+        product.is_available = request.POST.get('is_available') == 'on'
+
+        if product.title and product.price and product.inventory and category_id:
+            product.category = Category.objects.get(id=category_id)
+            product.save()
+            return redirect('products')
+
+    return render(
+        request,
+        'edit_product.html',
+        {
+            'product': product,
+            'categories_set': categories_set,
+            'name': 'Shad Abdullah'
+        }
+    )
+
+def delete_product(request, product_id):
+    if request.method == 'POST':
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()
+    return redirect('products')
 
 
 # def products(request):
