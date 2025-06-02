@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Online Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar for webkit browsers (optional) */
+        .horizontal-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+        .horizontal-scroll::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1; /* cool-gray-300 */
+            border-radius: 10px;
+        }
+        .horizontal-scroll::-webkit-scrollbar-track {
+            background-color: #f1f5f9; /* cool-gray-100 */
+        }
+        /* For Firefox */
+        .horizontal-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+        /* Ensure SVGs in buttons don't shrink excessively */
+        .icon-button svg {
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="{% url 'home' %}" class="flex items-center space-x-2">
+                        <svg class="h-8 w-auto text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 9.563C9 9.254 9.254 9 9.563 9h4.874c.309 0 .563.254.563.563v4.874c0 .309-.254.563-.563.563H9.563C9.254 15 9 14.746 9 14.437V9.564z" />
+                        </svg>
+                        <span class="font-bold text-xl text-gray-800">StoreName</span>
+                    </a>
+                </div>
+
+                <div class="flex items-center space-x-4 sm:space-x-6">
+                    <a href="{% url 'dashboard' %}">Dashboard</a>
+                    <a href="" class="text-gray-600 hover:text-indigo-600 p-2 rounded-full hover:bg-gray-100 transition duration-150 icon-button" aria-label="Sign In">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                    </a>
+                    <a href="" class="text-gray-600 hover:text-indigo-600 p-2 rounded-full hover:bg-gray-100 transition duration-150 icon-button relative" aria-label="Cart">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+                        </svg>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">Categories</h2>
+                <a href="all_categories.html" class="text-indigo-600 hover:text-indigo-800 font-semibold whitespace-nowrap px-3 py-1.5 rounded-md hover:bg-indigo-50 transition-colors">View All &rarr;</a>
+            </div>
+            <div class="horizontal-scroll overflow-x-auto pb-4">
+                <div class="flex flex-wrap gap-4 sm:gap-6" style="min-width: max-content;">
+                    <a href="category_electronics.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/E0E7FF/4F46E5?text=Cat1" alt="Category 1" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https://placehold.co/60x60/E0E7FF/4F46E5?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Electronics</span>
+                    </a>
+                    <a href="category_books.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/D1FAE5/059669?text=Cat2" alt="Category 2" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https://placehold.co/60x60/D1FAE5/059669?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Books</span>
+                    </a>
+                    <a href="category_clothing.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/FEF3C7/D97706?text=Cat3" alt="Category 3" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https://placehold.co/60x60/FEF3C7/D97706?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Clothing</span>
+                    </a>
+                    <a href="category_home.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/FEE2E2/DC2626?text=Cat4" alt="Category 4" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https://placehold.co/60x60/FEE2E2/DC2626?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Home & Kitchen</span>
+                    </a>
+                    <a href="category_beauty.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/E0F2FE/0891B2?text=Cat5" alt="Category 5" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https://placehold.co/60x60/E0F2FE/0891B2?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Beauty</span>
+                    </a>
+                    <a href="category_sports.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/F3E8FF/7E22CE?text=Cat6" alt="Category 6" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https.placehold.co/60x60/F3E8FF/7E22CE?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Sports</span>
+                    </a>
+                     <a href="category_toys.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/ECFCCB/65A30D?text=Cat7" alt="Category 7" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https.placehold.co/60x60/ECFCCB/65A30D?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Toys & Games</span>
+                    </a>
+                    <a href="category_automotive.html" class="block w-36 sm:w-40 h-24 sm:h-28 bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-3 text-center flex flex-col justify-center items-center no-underline">
+                        <img src="https://placehold.co/60x60/FFF7ED/EA580C?text=Cat8" alt="Category 8" class="w-10 h-10 sm:w-12 sm:h-12 mb-2 rounded-md object-cover" onerror="this.src='https.placehold.co/60x60/FFF7ED/EA580C?text=Error'">
+                        <span class="text-sm font-medium text-gray-700">Automotive</span>
+                    </a>
+                    </div>
+            </div>
+        </section>
+
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800">Featured Electronics</h3>
+                <a href="category_electronics_all.html" class="text-indigo-600 hover:text-indigo-800 font-semibold whitespace-nowrap px-3 py-1.5 rounded-md hover:bg-indigo-50 transition-colors">View All &rarr;</a>
+            </div>
+            <div class="horizontal-scroll flex overflow-x-auto space-x-4 sm:space-x-6 pb-4">
+                <a href="product_smartphone.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/E0E7FF/4F46E5?text=Product+1" alt="Product 1" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/E0E7FF/4F46E5?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Smartphone XYZ</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">High-end smartphone</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$699.99</p>
+                    </div>
+                </a>
+                <a href="product_laptop.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/DBEAFE/1D4ED8?text=Product+2" alt="Product 2" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/DBEAFE/1D4ED8?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Laptop Pro</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">Powerful work laptop</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$1299.00</p>
+                    </div>
+                </a>
+                <a href="product_headphones.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/C7D2FE/4338CA?text=Product+3" alt="Product 3" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/C7D2FE/4338CA?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Wireless Headphones</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">Noise-cancelling</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$199.50</p>
+                    </div>
+                </a>
+                <a href="product_smartwatch.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/A5B4FC/5B21B6?text=Product+4" alt="Product 4" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/A5B4FC/5B21B6?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Smart Watch Series 5</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">Fitness tracker</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$249.00</p>
+                    </div>
+                </a>
+                 <a href="product_speaker.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/818CF8/6D28D9?text=Product+5" alt="Product 5" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/818CF8/6D28D9?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Bluetooth Speaker</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">Portable & Loud</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$79.99</p>
+                    </div>
+                </a>
+                </div>
+        </section>
+
+        <section class="mb-12">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800">Bestselling Books</h3>
+                <a href="category_books_all.html" class="text-indigo-600 hover:text-indigo-800 font-semibold whitespace-nowrap px-3 py-1.5 rounded-md hover:bg-indigo-50 transition-colors">View All &rarr;</a>
+            </div>
+            <div class="horizontal-scroll flex overflow-x-auto space-x-4 sm:space-x-6 pb-4">
+                <a href="book_novel.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/D1FAE5/059669?text=Book+1" alt="Book 1" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/D1FAE5/059669?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">The Great Novel</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">By Jane Author</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$15.99</p>
+                    </div>
+                </a>
+                <a href="book_code.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/A7F3D0/047857?text=Book+2" alt="Book 2" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/A7F3D0/047857?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Learning Code</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">By Dev Guru</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$29.95</p>
+                    </div>
+                </a>
+                <a href="book_mystery.html" class="block flex-shrink-0 w-48 sm:w-56 bg-white rounded-lg shadow hover:shadow-lg transition-shadow overflow-hidden no-underline">
+                    <img src="https://placehold.co/300x200/6EE7B7/065F46?text=Book+3" alt="Book 3" class="w-full h-32 sm:h-36 object-cover" onerror="this.src='https://placehold.co/300x200/6EE7B7/065F46?text=Error'">
+                    <div class="p-3 sm:p-4">
+                        <h4 class="text-sm sm:text-base font-medium text-gray-800 truncate">Mystery Island</h4>
+                        <p class="text-xs sm:text-sm text-gray-600">By Story Teller</p>
+                        <p class="text-sm sm:text-base font-bold text-indigo-600 mt-1">$12.50</p>
+                    </div>
+                </a>
+                </div>
+        </section>
+
+        </main>
+
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>&copy; 2024 StoreName. All rights reserved.</p>
+            <p class="text-sm text-gray-400 mt-1">Powered by Tailwind CSS</p>
+        </div>
+    </footer>
+
+</body>
+</html>
