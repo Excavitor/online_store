@@ -1,23 +1,56 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
-from store_app.models import Customer, Category, Order, Product, OrderItem
-
+from django.db.models import Sum
+from django.shortcuts import render, redirect
+# Make sure to import your models at the top
+from .models import Category, Product, Customer, Order, OrderItem  # Added Category and Product
 from django.contrib.auth.models import User, Group
-from django.contrib.auth.decorators import login_required # Optional: if you want to protect these views
-from .forms import UserCreationForm, UserEditForm, RoleForm # Import your new forms
-from django.contrib import messages # For showing success/error messages
+from django.contrib.auth.decorators import login_required
+from .forms import UserCreationForm, UserEditForm, RoleForm
+from django.contrib import messages
 from decimal import Decimal
+from django.shortcuts import get_object_or_404
 
-# Create your views here.
-# def home(request):
-#     return HttpResponse("Hello, world. You're at the home page.")
 
+# Updated home view
 def home(request):
-    return render(request, 'store_app/home.html')
+    categories_set = Category.objects.all()
+
+    # Fetch some products - you can customize these queries
+    # For example, featured electronics (assuming a category named 'Electronics')
+    try:
+        electronics_category = Category.objects.get(title__iexact='Electronics')
+        featured_electronics = Product.objects.filter(category=electronics_category, is_available=True)[:5]
+    except Category.DoesNotExist:
+        featured_electronics = Product.objects.none()  # Empty queryset if category doesn't exist
+
+    # For example, bestselling books (assuming a category named 'Books')
+    try:
+        books_category = Category.objects.get(title__iexact='Books')
+        bestselling_books = Product.objects.filter(category=books_category, is_available=True)[
+                            :3]  # Show 3 bestselling books
+    except Category.DoesNotExist:
+        bestselling_books = Product.objects.none()  # Empty queryset
+
+    most_ordered_products = Product.objects.annotate(
+        total_ordered_quantity=Sum('orderitem__quantity')
+    ).filter(
+        total_ordered_quantity__gt=0
+    ).order_by(
+        '-total_ordered_quantity'
+    )[:5]  # Get top 5 most ordered products, you can change this number
+
+    context = {
+        'categories_set': categories_set,
+        # 'featured_electronics': featured_electronics,
+        # 'bestselling_books': bestselling_books,
+        'most_ordered_products': most_ordered_products,
+    }
+    return render(request, 'store_app/home.html', context)
+
 
 def list_users(request):
     users = User.objects.all()
     return render(request, 'store_app/users_list.html', {'users_set': users, 'name': 'Shad Abdullah'})
+
 
 def create_user(request):
     if request.method == 'POST':
@@ -32,6 +65,7 @@ def create_user(request):
         form = UserCreationForm()
     return render(request, 'store_app/user_form.html', {'form': form, 'action': 'Create', 'name': 'Shad Abdullah'})
 
+
 # @login_required (optional)
 def edit_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
@@ -45,15 +79,17 @@ def edit_user(request, user_id):
             messages.error(request, "Please correct the errors below.")
     else:
         form = UserEditForm(instance=user)
-    return render(request, 'store_app/user_form.html', {'form': form, 'user_obj': user, 'action': 'Edit', 'name': 'Shad Abdullah'})
+    return render(request, 'store_app/user_form.html',
+                  {'form': form, 'user_obj': user, 'action': 'Edit', 'name': 'Shad Abdullah'})
+
 
 # @login_required (optional)
 def delete_user(request, user_id):
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         if request.user.id == user.id:
-             messages.error(request, "You cannot delete yourself.")
-             return redirect('list_users')
+            messages.error(request, "You cannot delete yourself.")
+            return redirect('list_users')
         username = user.username
         user.delete()
         messages.success(request, f"User '{username}' deleted successfully.")
@@ -61,9 +97,11 @@ def delete_user(request, user_id):
     # return render(request, 'store_app/user_confirm_delete.html', {'user_obj': user, 'name': 'Shad Abdullah'})
     return redirect('list_users')
 
+
 def list_roles(request):
     roles = Group.objects.all()
     return render(request, 'store_app/roles_list.html', {'roles_set': roles, 'name': 'Shad Abdullah'})
+
 
 def create_role(request):
     if request.method == 'POST':
@@ -78,6 +116,7 @@ def create_role(request):
         form = RoleForm()
     return render(request, 'store_app/role_form.html', {'form': form, 'action': 'Create', 'name': 'Shad Abdullah'})
 
+
 # @login_required (optional)
 def edit_role(request, role_id):
     role = get_object_or_404(Group, id=role_id)
@@ -91,7 +130,9 @@ def edit_role(request, role_id):
             messages.error(request, "Please correct the errors below.")
     else:
         form = RoleForm(instance=role)
-    return render(request, 'store_app/role_form.html', {'form': form, 'role_obj': role, 'action': 'Edit', 'name': 'Shad Abdullah'})
+    return render(request, 'store_app/role_form.html',
+                  {'form': form, 'role_obj': role, 'action': 'Edit', 'name': 'Shad Abdullah'})
+
 
 # @login_required (optional)
 def delete_role(request, role_id):
@@ -99,13 +140,14 @@ def delete_role(request, role_id):
     if request.method == 'POST':
         role_name = role.name
         if role.user_set.exists():
-             messages.error(request, f"Role '{role_name}' is in use and cannot be deleted.")
-             return redirect('list_roles')
+            messages.error(request, f"Role '{role_name}' is in use and cannot be deleted.")
+            return redirect('list_roles')
         role.delete()
         messages.success(request, f"Role '{role_name}' deleted successfully.")
         return redirect('list_roles')
     # return render(request, 'store_app/role_confirm_delete.html', {'role_obj': role, 'name': 'Shad Abdullah'})
     return redirect('list_roles')
+
 
 def dashboard(request):
     customer_orders_pending = Customer.objects.filter(order__status='Pending')
@@ -119,6 +161,7 @@ def dashboard(request):
         }
     )
 
+
 def customers(request):
     customers_set = Customer.objects.all()
     return render(
@@ -126,8 +169,10 @@ def customers(request):
         'customers.html',
         {
             'customers_set': list(customers_set),
+            'name': 'Shad Abdullah'  # Added name here
         }
     )
+
 
 def products(request):
     products_set = Product.objects.all()
@@ -139,6 +184,7 @@ def products(request):
             'products_set': list(products_set),
         }
     )
+
 
 def add_product(request):
     categories_set = Category.objects.all()
@@ -168,6 +214,7 @@ def add_product(request):
         {'categories_set': categories_set, 'name': 'Shad Abdullah'}
     )
 
+
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     categories_set = Category.objects.all()
@@ -195,6 +242,7 @@ def edit_product(request, product_id):
         }
     )
 
+
 def delete_product(request, product_id):
     if request.method == 'POST':
         product = get_object_or_404(Product, id=product_id)
@@ -203,15 +251,13 @@ def delete_product(request, product_id):
 
 
 def orders(request):
-    orders_set = Order.objects.all()
-    for o in orders_set:
-        o.customer_name = f"{o.customer.first_name} {o.customer.last_name}"
-
+    orders_set = Order.objects.select_related('customer').all()  # Optimized query
+    # No need to manually add customer_name if you access it via order_item.customer.first_name in template
     return render(
         request,
         'orders.html',
         {
-            'orders_set': list(orders_set),
+            'orders_set': orders_set,  # No need to convert to list here
             'name': 'Shad Abdullah'
         }
     )
@@ -232,17 +278,14 @@ def add_order(request):
                     customer=customer_instance,
                     status=status
                 )
+                messages.success(request, "Order added successfully!")
                 return redirect('orders')
             except Customer.DoesNotExist:
-                # Handle error: Customer not found
-                # You might want to add a message here using Django's messages framework
-                pass
+                messages.error(request, "Selected customer not found.")
             except Exception as e:
-                # Handle other potential errors
-                pass
+                messages.error(request, f"An error occurred: {e}")
         else:
-            # Handle error: Missing fields
-            pass
+            messages.error(request, "Status and Customer are required.")
 
     context = {
         'customers_set': customers_set,
@@ -255,7 +298,7 @@ def add_order(request):
 def edit_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     customers_set = Customer.objects.all()
-    status_choices = Order.STATUS_CHOICES # Pass status choices
+    status_choices = Order.STATUS_CHOICES
 
     if request.method == 'POST':
         new_status = request.POST.get('status')
@@ -267,103 +310,82 @@ def edit_order(request, order_id):
                 order.status = new_status
                 order.customer = customer_instance
                 order.save()
+                messages.success(request, f"Order ID: {order.id} updated successfully!")
                 return redirect('orders')
             except Customer.DoesNotExist:
-                # Add error handling/message
-                pass
-            # Add other error handling as needed
+                messages.error(request, "Selected customer not found.")
+            except Exception as e:
+                messages.error(request, f"An error occurred: {e}")
         else:
-            # Add error handling for missing fields
-            pass
+            messages.error(request, "Status and Customer are required.")
 
     context = {
         'order': order,
         'customers_set': customers_set,
-        'status_choices': status_choices, # Add to context
-        'name': 'Shad Abdullah' # Or however you get the admin name
+        'status_choices': status_choices,
+        'name': 'Shad Abdullah'
     }
     return render(request, 'edit_order.html', context)
+
 
 def delete_order(request, order_id):
     if request.method == 'POST':
         order = get_object_or_404(Order, id=order_id)
+        order_id_display = order.id
         order.delete()
+        messages.success(request, f"Order ID: {order_id_display} deleted successfully.")
     return redirect('orders')
 
 
 def orderitems(request):
-    orderitems_set = OrderItem.objects.all()
-
-    # Calculate total price for each item
-    # for item in orderitems_set:
-        # item.total_price = item.quantity * item.unit_price
-        # In Python, multiplying an int (quantity) by a Decimal (unit_price)
-        # correctly results in a Decimal, which is what we want.
-
+    orderitems_set = OrderItem.objects.select_related('order__customer', 'product').all()
     context = {
-        'orderitems_set': orderitems_set,  # No need to convert to list here if iterating in template
-        'name': 'Shad Abdullah'  # Assuming this is still needed
+        'orderitems_set': orderitems_set,
+        'name': 'Shad Abdullah'
     }
     return render(request, 'orderitems.html', context)
 
-# def orderitems(request):
-#     orderitems_set = OrderItem.objects.all()
-#     return render(
-#         request,
-#         'orderitems.html',
-#         {
-#             'orderitems_set': list(orderitems_set),
-#         }
-#     )
-
 
 def add_order_item(request):
-    orders = Order.objects.all()  # To select an order
-    products = Product.objects.all()  # To select a product
+    orders = Order.objects.select_related('customer').all()
+    products_qs = Product.objects.filter(is_available=True)  # Renamed to avoid conflict
 
     if request.method == 'POST':
         order_id = request.POST.get('order')
         product_id = request.POST.get('product')
         quantity_str = request.POST.get('quantity')
-        unit_price_str = request.POST.get('unit_price')  # Price at the time of adding
+        unit_price_str = request.POST.get('unit_price')
 
         if order_id and product_id and quantity_str and unit_price_str:
             try:
                 order = Order.objects.get(id=order_id)
-                product = Product.objects.get(id=product_id)
+                product_instance = Product.objects.get(id=product_id)  # Renamed
                 quantity = int(quantity_str)
                 unit_price = Decimal(unit_price_str)
 
                 if quantity < 1:
-                    # messages.error(request, "Quantity must be at least 1.")
-                    pass  # Add proper error handling
+                    messages.error(request, "Quantity must be at least 1.")
                 else:
                     OrderItem.objects.create(
                         order=order,
-                        product=product,
+                        product=product_instance,  # Use renamed variable
                         quantity=quantity,
                         unit_price=unit_price
                     )
-                    # messages.success(request, "Order item added successfully!")
-                    return redirect('orderitems')  # Or redirect to the specific order's detail page
+                    messages.success(request, "Order item added successfully!")
+                    return redirect('orderitems')
             except Order.DoesNotExist:
-                # messages.error(request, "Selected order not found.")
-                pass
+                messages.error(request, "Selected order not found.")
             except Product.DoesNotExist:
-                # messages.error(request, "Selected product not found.")
-                pass
-            except ValueError:  # For int/Decimal conversion
-                # messages.error(request, "Invalid quantity or unit price format.")
-                pass
+                messages.error(request, "Selected product not found.")
+            except ValueError:
+                messages.error(request, "Invalid quantity or unit price format.")
         else:
-            # messages.error(request, "All fields are required.")
-            pass
+            messages.error(request, "All fields are required.")
 
-    # For GET request or if POST fails, prepare context for the form
-    # If you want to pre-fill unit_price based on product selection via JavaScript, that's an enhancement
     context = {
         'orders': orders,
-        'products': products,
+        'products': products_qs,  # Use renamed variable
         'name': 'Shad Abdullah'
     }
     return render(request, 'add_order_item.html', context)
@@ -371,46 +393,38 @@ def add_order_item(request):
 
 def edit_order_item(request, order_item_id):
     order_item = get_object_or_404(OrderItem, id=order_item_id)
-    # Typically, you might not change the order or product of an existing order item.
-    # If you do, you'll need to provide 'orders' and 'products' in the context for dropdowns.
-    # For this example, we'll focus on quantity and unit_price.
-
-    products = Product.objects.all()  # If you want to allow changing the product
+    products_qs = Product.objects.filter(is_available=True)  # Renamed
 
     if request.method == 'POST':
         quantity_str = request.POST.get('quantity')
         unit_price_str = request.POST.get('unit_price')
-        product_id_str = request.POST.get('product')  # If product is editable
+        product_id_str = request.POST.get('product')
 
-        if quantity_str and unit_price_str and product_id_str:  # Add other validations as needed
+        if quantity_str and unit_price_str and product_id_str:
             try:
                 quantity = int(quantity_str)
                 unit_price = Decimal(unit_price_str)
-                product = Product.objects.get(id=product_id_str)
+                product_instance = Product.objects.get(id=product_id_str)  # Renamed
 
                 if quantity < 1:
-                    # messages.error(request, "Quantity must be at least 1.")
-                    pass
+                    messages.error(request, "Quantity must be at least 1.")
                 else:
-                    order_item.product = product  # Update product if changed
+                    order_item.product = product_instance  # Use renamed
                     order_item.quantity = quantity
                     order_item.unit_price = unit_price
                     order_item.save()
-                    # messages.success(request, "Order item updated successfully!")
+                    messages.success(request, "Order item updated successfully!")
                     return redirect('orderitems')
             except Product.DoesNotExist:
-                # messages.error(request, "Selected product not found.")
-                pass
+                messages.error(request, "Selected product not found.")
             except ValueError:
-                # messages.error(request, "Invalid quantity or unit price format.")
-                pass
+                messages.error(request, "Invalid quantity or unit price format.")
         else:
-            # messages.error(request, "Quantity, Unit Price, and Product are required.")
-            pass
+            messages.error(request, "Quantity, Unit Price, and Product are required.")
 
     context = {
         'order_item': order_item,
-        'products': products,  # Pass products for the dropdown
+        'products': products_qs,  # Use renamed
         'name': 'Shad Abdullah'
     }
     return render(request, 'edit_order_item.html', context)
@@ -419,10 +433,11 @@ def edit_order_item(request, order_item_id):
 def delete_order_item(request, order_item_id):
     order_item = get_object_or_404(OrderItem, id=order_item_id)
     if request.method == 'POST':
-        # order_item_repr = f"Item '{order_item.product.title}' from Order ID {order_item.order.id}"
+        order_item_repr = f"Item '{order_item.product.title}' from Order ID {order_item.order.id}"
         order_item.delete()
-        # messages.success(request, f"{order_item_repr} deleted successfully.")
-    return redirect('orderitems')  # Or redirect to the specific order's detail page
+        messages.success(request, f"{order_item_repr} deleted successfully.")
+    return redirect('orderitems')
+
 
 def categories(request):
     categories_set = Category.objects.all()
@@ -435,35 +450,28 @@ def categories(request):
         }
     )
 
+
 def add_category(request):
     if request.method == 'POST':
         title = request.POST.get('title')
-        slug = request.POST.get('slug') # Assuming manual slug input for now
+        slug = request.POST.get('slug')
 
-        # Basic validation: title and slug are required
         if title and slug:
-            # Optional: Auto-generate slug if not provided or to ensure uniqueness
-            # if not slug:
-            #     slug = slugify(title)
-            # Check for slug uniqueness if you're concerned about IntegrityError
-            # if Category.objects.filter(slug=slug).exists():
-            #     # Handle error: slug already exists
-            #     # messages.error(request, f"A category with slug '{slug}' already exists.")
-            #     pass # Add error handling
-            # else:
-            Category.objects.create(title=title, slug=slug)
-            # messages.success(request, f"Category '{title}' created successfully!")
-            return redirect('categories') # Redirect to the list of categories
+            if Category.objects.filter(slug=slug).exists():
+                messages.error(request, f"A category with slug '{slug}' already exists.")
+            else:
+                Category.objects.create(title=title, slug=slug)
+                messages.success(request, f"Category '{title}' created successfully!")
+                return redirect('categories')
         else:
-            # Handle error: missing fields
-            # messages.error(request, "Title and slug are required.")
-            pass # Add error handling
+            messages.error(request, "Title and slug are required.")
 
     return render(
         request,
-        'add_category.html', # You'll need to create this template
-        {'name': 'Shad Abdullah'} # Pass any other context needed
+        'add_category.html',
+        {'name': 'Shad Abdullah'}
     )
+
 
 def edit_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -472,28 +480,27 @@ def edit_category(request, category_id):
         slug = request.POST.get('slug')
 
         if title and slug:
-            category.title = title
-            category.slug = slug
-            # Add uniqueness check for slug if necessary, excluding the current category instance
-            # if Category.objects.filter(slug=slug).exclude(id=category_id).exists():
-            #     # messages.error(request, f"Another category with slug '{slug}' already exists.")
-            #     pass # Add error handling
-            # else:
-            category.save()
-            # messages.success(request, f"Category '{category.title}' updated successfully!")
-            return redirect('categories')
+            # Check if slug is being changed and if the new one conflicts
+            if category.slug != slug and Category.objects.filter(slug=slug).exclude(id=category_id).exists():
+                messages.error(request, f"Another category with slug '{slug}' already exists.")
+            else:
+                category.title = title
+                category.slug = slug
+                category.save()
+                messages.success(request, f"Category '{category.title}' updated successfully!")
+                return redirect('categories')
         else:
-            # messages.error(request, "Title and slug are required.")
-            pass # Add error handling
+            messages.error(request, "Title and slug are required.")
 
     return render(
         request,
-        'edit_category.html', # You'll need to create this template
+        'edit_category.html',
         {
             'category': category,
             'name': 'Shad Abdullah'
         }
     )
+
 
 def delete_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
@@ -501,8 +508,7 @@ def delete_category(request, category_id):
         try:
             category_title = category.title
             category.delete()
-            # messages.success(request, f"Category '{category_title}' deleted successfully.")
-        except Exception as e: # For example, if protected by on_delete=PROTECT and there are related products
-            # messages.error(request, f"Could not delete category '{category.title}'. Reason: {e}")
-            pass # Add proper error handling
+            messages.success(request, f"Category '{category_title}' deleted successfully.")
+        except Exception as e:
+            messages.error(request, f"Could not delete category '{category.title}'. It might be in use. Details: {e}")
     return redirect('categories')
